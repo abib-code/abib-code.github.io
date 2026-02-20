@@ -537,12 +537,19 @@
       { id:"P006", name:"Rótulo Casa Organiza", formato:"Especiais", categoria:"CASA", price: 10.00, image: ASSETS.placeholderLabel }
     ];
 
-    function buildFormatosFromProducts(products){
+    // =========================
+// Listas dinâmicas (só mostra o que existe em PRODUCTS)
+// =========================
+function buildFormatosFromProducts(products){
   const set = new Set(products.map(p => p.formato).filter(Boolean));
-  // Mantém uma ordem “bonita”
+
+  // Ordem preferida (se existir)
   const ordered = ["Redondos", "Quadrados", "Especiais"];
-  const list = ordered.filter(x => set.has(x)).concat([...set].filter(x => !ordered.includes(x)).sort());
-  // Sempre inclui "Todos" no começo
+  const list =
+    ordered.filter(x => set.has(x))
+      .concat([...set].filter(x => !ordered.includes(x)).sort((a,b)=>a.localeCompare(b,"pt-BR")));
+
+  // Sempre inclui "Todos"
   return [{ key:"Todos", label:"TODOS", icon:"cloud" }].concat(
     list.map(f => ({
       key: f,
@@ -554,10 +561,13 @@
 
 function buildCategoriasFromProducts(products){
   const set = new Set(products.map(p => p.categoria).filter(Boolean));
-  // Ordena em PT-BR (para ficar bonitinho com acentos)
-  const sorted = [...set].sort((a,b) => a.localeCompare(b, "pt-BR"));
+  const sorted = [...set].sort((a,b)=>a.localeCompare(b, "pt-BR"));
   return ["TODOS", ...sorted];
 }
+
+// Gera as listas (dinâmicas)
+const FORMATOS_DIN = buildFormatosFromProducts(PRODUCTS);
+const CATEGORIAS_DIN = buildCategoriasFromProducts(PRODUCTS);
 
     // =========================
     // 3) ESTADO
@@ -615,7 +625,7 @@ function buildCategoriasFromProducts(products){
     function renderFormatTabs(){
       const wrap = el("formatTabs");
       wrap.innerHTML = "";
-      FORMATOS.forEach(f => {
+      FORMATOS_DIN.forEach(f => {
         const b = document.createElement("div");
         b.className = "tab" + (state.formato === f.key ? " active" : "");
         b.innerHTML = `${iconSvg(f.icon)} <span>${f.label}</span>`;
@@ -634,7 +644,7 @@ function buildCategoriasFromProducts(products){
     function renderCategorias(){
       const list = el("catList");
       list.innerHTML = "";
-      CATEGORIAS.forEach(c => {
+      CATEGORIAS_DIN.forEach(c => {
         const btn = document.createElement("button");
         btn.className = "catBtn" + (state.categoria === c ? " active" : "");
         btn.textContent = c;
@@ -818,5 +828,6 @@ function buildCategoriasFromProducts(products){
   </script>
 </body>
 </html>
+
 
 
