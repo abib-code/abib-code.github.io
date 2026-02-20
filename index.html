@@ -537,6 +537,28 @@
       { id:"P006", name:"Rótulo Casa Organiza", formato:"Especiais", categoria:"CASA", price: 10.00, image: ASSETS.placeholderLabel }
     ];
 
+    function buildFormatosFromProducts(products){
+  const set = new Set(products.map(p => p.formato).filter(Boolean));
+  // Mantém uma ordem “bonita”
+  const ordered = ["Redondos", "Quadrados", "Especiais"];
+  const list = ordered.filter(x => set.has(x)).concat([...set].filter(x => !ordered.includes(x)).sort());
+  // Sempre inclui "Todos" no começo
+  return [{ key:"Todos", label:"TODOS", icon:"cloud" }].concat(
+    list.map(f => ({
+      key: f,
+      label: f.toUpperCase(),
+      icon: f === "Redondos" ? "circle" : f === "Quadrados" ? "square" : "heart"
+    }))
+  );
+}
+
+function buildCategoriasFromProducts(products){
+  const set = new Set(products.map(p => p.categoria).filter(Boolean));
+  // Ordena em PT-BR (para ficar bonitinho com acentos)
+  const sorted = [...set].sort((a,b) => a.localeCompare(b, "pt-BR"));
+  return ["TODOS", ...sorted];
+}
+
     // =========================
     // 3) ESTADO
     // =========================
@@ -796,4 +818,5 @@
   </script>
 </body>
 </html>
+
 
